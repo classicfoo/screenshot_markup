@@ -11,3 +11,4 @@ Copy and paste screenshots to the app and mark it up.
 - Press Ctrl + V to paste an image to clipboard.
 - Click and drag to use yellow highlighter. (to highlight things on the screenshot) 
 - Press Ctrl + C to copy the marked up image to clipboard.
+- Press Ctrl + S to save the marked up image as jpg file.
