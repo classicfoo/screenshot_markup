@@ -3,6 +3,7 @@ from PIL import Image, ImageTk, ImageDraw, ImageFilter
 import sys
 import win32clipboard
 from io import BytesIO
+from tkinter import filedialog
 
 class ImageViewer(tk.Tk):
     def __init__(self, image_path=None):
@@ -31,9 +32,19 @@ class ImageViewer(tk.Tk):
 
         # Bind Ctrl+V to load image from clipboard
         self.bind("<Control-v>", lambda event: self.load_image_from_clipboard())
+        
+        # Bind Ctrl+S to the save_image method in the __init__ constructor
+        self.bind("<Control-s>", lambda event: self.save_image())
 
         # Display the image
         self.update_image()
+    
+    def save_image(self):
+        if self.final_image is not None:
+            file_path = filedialog.asksaveasfilename(defaultextension=".jpg", filetypes=[("JPEG files", "*.jpg")])
+            if file_path:
+                # Convert the image to RGB mode before saving
+                self.final_image.convert('RGB').save(file_path, "JPEG")
 
     def copy_image(self, event):
         if self.final_image is not None:
