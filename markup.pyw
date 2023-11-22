@@ -1,5 +1,5 @@
 import tkinter as tk
-from PIL import Image, ImageTk, ImageDraw, ImageFilter
+from PIL import Image, ImageTk, ImageDraw, ImageFilter, ImageOps
 import sys
 import win32clipboard
 from io import BytesIO
@@ -27,8 +27,11 @@ class ImageViewer(tk.Tk):
 
         # Bind mouse events for drawing
         self.canvas.bind("<ButtonPress-1>", self.on_button_press)
+        self.canvas.bind("<ButtonPress-3>", self.on_button_press)
         self.canvas.bind("<B1-Motion>", self.on_move_press)
+        self.canvas.bind("<B3-Motion>", self.on_move_press)
         self.canvas.bind("<ButtonRelease-1>", self.on_button_release)
+        self.canvas.bind("<ButtonRelease-3>", self.on_button_release)
 
         # Bind Ctrl+V to load image from clipboard
         self.bind("<Control-v>", lambda event: self.load_image_from_clipboard())
@@ -68,7 +71,8 @@ class ImageViewer(tk.Tk):
 
     def update_image(self):
         if self.original_image is not None:
-            self.final_image = add_shadow(self.original_image)
+            self.final_image = add_border(self.original_image)
+            self.final_image = add_shadow(self.final_image)
             self.display_image = ImageTk.PhotoImage(self.final_image)
 
             # Update canvas with the new image
@@ -84,8 +88,16 @@ class ImageViewer(tk.Tk):
         # Convert event coordinates to canvas coordinates
         self.start_x = self.canvas.canvasx(event.x)
         self.start_y = self.canvas.canvasy(event.y)
-        # Create a rectangle (initially a single point)
-        self.rect = self.canvas.create_rectangle(self.start_x, self.start_y, self.start_x + 1, self.start_y + 1, outline="yellow")
+        # Store which button was pressed
+        self.button = event.num
+        # Create a rectangle (initially a single point) with different colors depending on the button
+        if self.button == 1:
+            outline_color = "yellow"
+            fill_color = "yellow"
+        elif self.button == 3:
+            outline_color = "black"
+            fill_color = "black"
+        self.rect = self.canvas.create_rectangle(self.start_x, self.start_y, self.start_x + 1, self.start_y + 1, outline=outline_color, fill=fill_color)
 
     def on_move_press(self, event):
         curX, curY = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
@@ -94,7 +106,15 @@ class ImageViewer(tk.Tk):
             x0, y0 = min(self.start_x, curX), min(self.start_y, curY)
             x1, y1 = max(self.start_x, curX), max(self.start_y, curY)
             self.canvas.coords(self.rect, x0, y0, x1, y1)
-            self.canvas.itemconfig(self.rect, outline="yellow", fill="yellow", stipple="gray50")
+            # Update the color of the rectangle depending on the button
+            if self.button == 1:
+                outline_color = "yellow"
+                fill_color = "yellow"
+            elif self.button == 3:
+                outline_color = "black"
+                fill_color = "black"
+            self.canvas.itemconfig(self.rect, outline=outline_color, fill=fill_color, stipple="gray50")
+
 
 
     def on_button_release(self, event):
@@ -109,15 +129,17 @@ class ImageViewer(tk.Tk):
             overlay = Image.new('RGBA', self.original_image.size, (0, 0, 0, 0))
             draw = ImageDraw.Draw(overlay)
 
-            # Draw the semi-transparent rectangle on the overlay
-            semi_transparent_color = (255, 255, 0, 128)  # Yellow, 50% opacity
-            draw.rectangle([x0, y0, x1, y1], fill=semi_transparent_color)
+            # Draw the rectangle on the overlay with different colors depending on the button
+            if self.button == 1:
+                color = (255, 255, 0, 128)  # Yellow, 50% opacity
+            elif self.button == 3:
+                color = (0, 0, 0, 255)  # Black, 100% opacity
+            draw.rectangle([x0, y0, x1, y1], fill=color)
 
             # Combine original image with overlay
             self.original_image = Image.alpha_composite(self.original_image.convert('RGBA'), overlay)
 
             self.update_image()
-
 
 # Existing functions
 def get_image_from_clipboard():
@@ -157,6 +179,11 @@ def add_shadow(image, offset=(13, 13), background_color='white', shadow_color='g
     shadow.paste(image, (image_left, image_top), image)
 
     return shadow
+
+def add_border(image, border=1, color='lightgrey'):
+    # Add a border of the given size and color
+    image_with_border = ImageOps.expand(image, border=border, fill=color)
+    return image_with_border
 
 def copy_to_clipboard(image):
     output = BytesIO()
