@@ -14,3 +14,8 @@ Copy and paste screenshots to the app and mark it up.
 - Press Ctrl + C to copy the marked up image to clipboard.
 - Press Ctrl + S to save the marked up image as jpg file.
 
+# Todo
+- Open image feature from file
+- Undo feature (for highlighter and redact rectangles)
+- Window center to screen
+- Message box center to window
