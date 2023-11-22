@@ -4,6 +4,9 @@ Copy and paste screenshots and mark it up.
 ## Requirements
 - To install win32clipboard:
 `pip install pywin32`
+- To install pillow:
+`pip install Pillow`
+
 
 ## Features
 - Adds a shadow to image so that the border is clearer. Especially when there is white image parts and is pasted on white background.
