@@ -3,7 +3,7 @@ from PIL import Image, ImageTk, ImageDraw, ImageFilter, ImageOps
 import sys
 import win32clipboard
 from io import BytesIO
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 
 class ImageViewer(tk.Tk):
     def __init__(self, image_path=None):
@@ -68,6 +68,8 @@ class ImageViewer(tk.Tk):
             self.update_image()
         else:
             print("No image found in clipboard.")
+            messagebox.showinfo("Screenshot Markup", "No image found in clipboard.")
+
 
     def update_image(self):
         if self.original_image is not None:
@@ -196,14 +198,13 @@ def copy_to_clipboard(image):
     win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
     win32clipboard.CloseClipboard()
 
-def load_image_from_clipboard(self):
-    img = get_image_from_clipboard()
-    if img is not None:
-        self.original_image = img
-        self.update_image()
-    else:
-        print("No image found in clipboard.")
-
+#def load_image_from_clipboard(self):
+#    img = get_image_from_clipboard()
+#    if img is not None:
+#        self.original_image = img
+#        self.update_image()
+#    else:
+#        print("No image found in clipboard.")
 
 def main(image_path=None):
     app = ImageViewer(image_path)
