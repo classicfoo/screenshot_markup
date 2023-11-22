@@ -1,5 +1,5 @@
 # Screenshot Markup
-Copy and paste screenshots to the app and mark it up.
+Copy and paste screenshots and mark it up.
 
 ## Requirements
 - To install win32clipboard:
